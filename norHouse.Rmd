@@ -17,6 +17,51 @@ When you save the notebook, an HTML file containing the code and output will be 
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 ```{r}
-
+# Importing required libraries
+library(ggplot2)
 ```
+```{r}
+dataset <- read.csv("dataset.csv")
+head(dataset)
+```
+```{r}
+# Visualizing the data
+ggplot(dataset, aes(x = area, y = price)) + geom_point(color = "blue") +labs(x = "Area", y = "Price", title = "Scatter Plot of Area vs Price") +theme_minimal()
+```
+```{r}
+# Separating the data into X and y
+X <- dataset$area
+y <- dataset$price
+```
+
+```{r}
+# Model training
+model <- lm(price ~ area, data = dataset)
+summary(model)
+```
+```{r}
+# Model prediction
+x <- as.numeric(readline(prompt = "Enter the area (8k-20k) of the house you want to predict the price of: "))
+if (x >= 8000 && x <= 20000) {
+  new_data <- data.frame(area = x)
+  y_pred <- predict(model, newdata = new_data)
+  print(paste("Predicted price of the house:", round(y_pred, 2)))
+
+  # Theory calculation
+  m <- coef(model)["area"]
+  b <- coef(model)["(Intercept)"]
+  print(paste("Theoretical calculation: Price =", round(m, 2), "* Area +", round(b, 2)))
+  print(paste("The price of the house is:", round(m * x + b, 2)))
+
+  # Visualizing the model
+  ggplot(dataset, aes(x = area, y = price)) +
+    geom_point(color = "blue", alpha = 0.6) +
+    geom_abline(slope = m, intercept = b, color = "red") +
+    labs(x = "Area", y = "Price", title = "Linear Regression Model") +
+    theme_minimal()
+} else {
+  print("Please enter a value within the range 8k-20k.")
+}
+```
+
 
